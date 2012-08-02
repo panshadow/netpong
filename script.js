@@ -77,7 +77,7 @@
     };
 
     var puck = [];
-
+    var time = 0;
     var fnLoop = function(){};
     var fcounter = 0;
     var fps = 0;
@@ -87,7 +87,8 @@
       bgBoard: '#ffffff',
       fgBorder: '#0000ff',
       fgPuck: '#ff0000',
-      pnum: 2
+      pnum: 2,
+      ptime: 15
     },cf);
 
     for(var i=0;i<opt.pnum;i++){
@@ -99,6 +100,7 @@
     }
 
     var reflectors = [];
+    var score = [0,0];
 
     reflectors.push(Reflector({
       level: 10,
@@ -157,10 +159,18 @@
       affected: function(x,y,vx,vy){ var cy = opt.height >> 1; return ( (x<15 || x>opt.width-15) && y >= cy-60 && y <=cy+60 ); },
       reflect: function(x,y,vx,vy){
         var res = { vx: (vx<0 ? -5 : 5), vy: 0 };
-        if( x<=10 || x>=opt.width-10){
+        if( x>=10 && x<=opt.width-10){
           res.vx=0;
           res.x = (x < 15 ? 5 : opt.width - 5);
-          console.log('GOAL!!!');
+          if( x < 15 ){
+            score[0]++;
+            res.x = 5;
+          }
+          else{
+            score[1]++;
+            res.x = opt.width - 5;
+          }
+
         }
         return res;
       }
@@ -217,12 +227,16 @@
       fcounter++;
       $e.ctx.font='8px Arial';
       $e.ctx.fillStyle='#000000';
-      $e.ctx.fillText('FPS'+fps,50,50);
+      $e.ctx.fillText('FPS:'+fps+' score: '+score[0]+':'+score[1]+' time: '+time,50,50);
     }
 
     self.updateFPS = function(){
       fps = fcounter;
       fcounter = 0;
+      if( ! --time ){
+        self.stop();
+      }
+
     }
 
     self.showFrame = function(){
@@ -323,6 +337,7 @@
       self.drawBorder();
       $f.online = true;//setInterval(fnLoop,10);
       $f.fps = setInterval(function(){ self.updateFPS(); },1000);
+      time = opt.ptime;
       fnLoop();
 
     }
@@ -365,6 +380,5 @@ var np = new NetPong({
   fgPuck: '#000033'
 });
 $(function(){
-  setTimeout(function(){ np.stop(); }, 1000*30 );
   np.start();
 })
