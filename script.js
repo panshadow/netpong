@@ -1,5 +1,24 @@
 (function($,window,undefined){
 
+
+  var Reflector = function(cf){
+    var self = $.extend({
+      level: 0,
+      affected: function(x,y,vx,vy){ return false; },
+      reflect: function(x,y,vx,vy){
+        return {
+          x: x,
+          y: y,
+          vx: vx,
+          vy: vy
+        }
+      }
+    },cf);
+
+    return self;
+
+  }
+
   var Puck = function( cf ){
     var self = this;
     var opt = $.extend({
@@ -11,8 +30,11 @@
       vy: 0,
       r: 5,
       ts: +(new Date()),
-      fgPuck: '#ff0000'
+      fgPuck: '#ff0000',
+      board: null
     },cf);
+
+
 
     self.set = function(key,value){
       if( key in opt ){
@@ -34,24 +56,8 @@
         dx = Math.round(opt.vx*dt/1000),
         dy = Math.round(opt.vy*dt/1000);
       opt.x += dx;
-      if( opt.x > opt.ex[1] ){
-        opt.x = 2*opt.ex[1] - opt.x;
-        opt.vx = -opt.vx;
-      }
-      else if( opt.x <= opt.ex[0] ){
-        opt.x = 2*opt.ex[0] - opt.x;
-        opt.vx = -opt.vx;
-      }
-
       opt.y += dy;
-      if( opt.y > opt.ey[1] ){
-        opt.y = 2*opt.ey[1] - opt.y;
-        opt.vy = -opt.vy;
-      }
-      else if( opt.y < opt.ey[0] ){
-        opt.y = 2*opt.ey[0] - opt.y;
-        opt.vy = -opt.vy;
-      }
+      $.extend( opt, opt.board.reflect(opt.x,opt.y,opt.vx,opt.vy) );
 
       opt.ts = now;
       return { x: opt.x, y: opt.y, r:opt.r, rx: opt.x-opt.r,ry:opt.y-opt.r,rw: 2*opt.r,rh: 2*opt.r };
@@ -85,8 +91,81 @@
     },cf);
 
     for(var i=0;i<opt.pnum;i++){
-      puck.push( new Puck({ x: 20, y: 20 }) );
+      puck.push(
+        new Puck({
+          board: self
+        })
+      );
     }
+
+    var reflectors = [];
+
+    reflectors.push(Reflector({
+      level: 10,
+      affected: function(x,y,vx,vy){ return ( x < 15 ); },
+      reflect:  function(x,y,vx,vy){
+        return {
+          x: 30 - x,
+          y: y,
+          vx: -vx,
+          vy: vy
+        }
+      }
+    }));
+
+    reflectors.push(Reflector({
+      level: 10,
+      affected: function(x,y,vx,vy){ return ( x > opt.width-15 ); },
+      reflect:  function(x,y,vx,vy){
+        return {
+          x: 2*(opt.width-15) - x,
+          y: y,
+          vx: -vx,
+          vy: vy
+        }
+      }
+    }));
+
+    reflectors.push(Reflector({
+      level: 10,
+      affected: function(x,y,vx,vy){ return ( y < 15 ); },
+      reflect:  function(x,y,vx,vy){
+        return {
+          x: x,
+          y: 30 - y,
+          vx: vx,
+          vy: -vy
+        }
+      }
+    }));
+
+    reflectors.push(Reflector({
+      level: 10,
+      affected: function(x,y,vx,vy){ return ( y > opt.height-15 ); },
+      reflect:  function(x,y,vx,vy){
+        return {
+          x: x,
+          y: 2*(opt.height-15) - y,
+          vx: vx,
+          vy: -vy
+        }
+      }
+    }));
+
+    reflectors.push(Reflector({
+      level: 20,
+      affected: function(x,y,vx,vy){ var cy = opt.height >> 1; return ( (x<15 || x>opt.width-15) && y >= cy-60 && y <=cy+60 ); },
+      reflect: function(x,y,vx,vy){
+        var res = { vx: (vx<0 ? -5 : 5), vy: 0 };
+        if( x<=10 || x>=opt.width-10){
+          res.vx=0;
+          res.x = (x < 15 ? 5 : opt.width - 5);
+          console.log('GOAL!!!');
+        }
+        return res;
+      }
+    }));
+
 
 
     self.init = function(){
@@ -109,14 +188,27 @@
       //self.start();
     }
 
+
+    self.reflect = function(){
+      var r = new Reflector();
+      for(var i=0,n=reflectors.length;i<n;i++){
+        var obj = reflectors[i];
+        if( obj.affected.apply(obj,arguments) && obj.level > r.level ){
+          r = obj;
+        }
+      }
+      return r.reflect.apply(r,arguments);
+    }
+
+
     self.gameLoop = function(){
       if( $f.online ){
         webkitRequestAnimationFrame( fnLoop, $e.canvas );
       }
       //self.showFrame();
-      self.clearBoard();
-      //self.drawBorder();
-
+      //self.clearBoard();
+      self.drawBorder();
+      self.drawLine();
       self.drawPuck();
       self.drawFPS();
     }
@@ -149,7 +241,48 @@
       $e.ctx.fillRect(0,0,opt.width,opt.height);
       $e.ctx.lineWidth=10;
       $e.ctx.strokeStyle=opt.fgBorder;
-      $e.ctx.strokeRect(0,0,opt.width,opt.height);
+      $e.ctx.strokeRect(5,5,opt.width-10,opt.height-10);
+
+      $e.ctx.strokeStyle=opt.bgBoard;
+      $e.ctx.beginPath();
+      $e.ctx.moveTo(5,(opt.height>>1) - 65);
+      $e.ctx.lineTo(5,(opt.height>>1) + 65);
+      $e.ctx.stroke();
+
+      $e.ctx.strokeStyle=opt.bgBoard;
+      $e.ctx.beginPath();
+      $e.ctx.moveTo(opt.width-5,(opt.height>>1) - 65);
+      $e.ctx.lineTo(opt.width-5,(opt.height>>1) + 65);
+      $e.ctx.stroke();
+
+    }
+
+    self.drawLine = function(){
+      var cx = opt.width >> 1,
+        cy = opt.height >> 1;
+
+      $e.ctx.fillStyle=opt.fgBorder;
+      $e.ctx.strokeStyle = opt.fgBorder;
+
+      $e.ctx.lineWidth=6;
+      $e.ctx.beginPath();
+
+      $e.ctx.moveTo( cx,0 );
+      $e.ctx.lineTo( cx, opt.height);
+      $e.ctx.stroke();
+
+      $e.ctx.beginPath();
+      $e.ctx.arc( cx, cy ,8,0,2*Math.PI);
+      $e.ctx.closePath();
+      $e.ctx.fill();
+
+      $e.ctx.beginPath();
+      $e.ctx.arc( cx, cy ,65,0,2*Math.PI);
+      $e.ctx.closePath();
+      $e.ctx.stroke();
+
+
+
     }
 
     self.drawPuck = function(){
@@ -163,19 +296,28 @@
       }
     }
 
+    self.drawRocket = function(){
+      $e.ctx.beginPath();
+
+    }
+
     self.start = function(){
       var ex = [15,opt.width-15];
       var ey = [15,opt.height-15];
       for( var i=0,n=puck.length;i<n;i++){
         puck[i].move();
-        var vx = 30 + Math.round(Math.random()*200);
-        var vy = 30 + Math.round(Math.random()*200);
+        var r = 100+Math.round(Math.random()*100);
+        var a = Math.random()*2*Math.PI;
+        var vx = Math.round(r*Math.cos(a)) || 10;
+        var vy = Math.round(r*Math.sin(a));
         //var color = Math.round(Math.sqrt(vx*vx+vy*vy));
         puck[i].set('vx',vx);
         puck[i].set('vy',vy);
-        puck[i].set('fgPuck','rgb('+vx+','+vy+',0)')
+        puck[i].set('fgPuck',opt.fgPuck);
         puck[i].set('ex',ex);
         puck[i].set('ey',ey);
+        puck[i].set('x',opt.width>>1);
+        puck[i].set('y',opt.height>>1);
       }
 
       self.drawBorder();
@@ -216,7 +358,12 @@
 
 })(jQuery,this);
 
-var np = new NetPong({ 'el': '#game',pnum: 400 });
+var np = new NetPong({
+  'el': '#game',
+  pnum: 10,
+  bgBoard: '#eeffff',
+  fgPuck: '#000033'
+});
 $(function(){
   setTimeout(function(){ np.stop(); }, 1000*30 );
   np.start();
