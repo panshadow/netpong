@@ -189,7 +189,7 @@
       $e.board.append($e.canvas);
       $e.ctx =  $e.canvas[0].getContext('2d');
       //$e.ctx = $e.buffCanvas[0].getContext('2d');
-      fnLoop = function(){ self.gameLoop(); }
+      fnLoop = function(){ if( !$f.online ){ return }; self.gameLoop(); }
 
       self.drawBorder();
       fnLoop();
@@ -229,6 +229,7 @@
     }
 
     self.updateFPS = function(){
+      if( !$f.online ){ return };
       fps = fcounter;
       fcounter = 0;
       if( ! --time ){
