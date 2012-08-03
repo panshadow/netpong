@@ -134,55 +134,14 @@
 
     reflectors.push(Reflector({
       level: 10,
-      affected: function(x,y,vx,vy){ return ( x < 15 ); },
-      reflect:  function(x,y,vx,vy){
-        return {
-          x: 30 - x,
-          y: y,
-          vx: -vx,
-          vy: vy
-        }
-      }
+      north: 15,
+      east: opt.width-15,
+      south: opt.height-15,
+      west: 15,
     }));
 
-    reflectors.push(Reflector({
-      level: 10,
-      affected: function(x,y,vx,vy){ return ( x > opt.width-15 ); },
-      reflect:  function(x,y,vx,vy){
-        return {
-          x: 2*(opt.width-15) - x,
-          y: y,
-          vx: -vx,
-          vy: vy
-        }
-      }
-    }));
 
-    reflectors.push(Reflector({
-      level: 10,
-      affected: function(x,y,vx,vy){ return ( y < 15 ); },
-      reflect:  function(x,y,vx,vy){
-        return {
-          x: x,
-          y: 30 - y,
-          vx: vx,
-          vy: -vy
-        }
-      }
-    }));
 
-    reflectors.push(Reflector({
-      level: 10,
-      affected: function(x,y,vx,vy){ return ( y > opt.height-15 ); },
-      reflect:  function(x,y,vx,vy){
-        return {
-          x: x,
-          y: 2*(opt.height-15) - y,
-          vx: vx,
-          vy: -vy
-        }
-      }
-    }));
 
     reflectors.push(Reflector({
       level: 20,
