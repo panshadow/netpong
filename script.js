@@ -145,9 +145,13 @@
 
     reflectors.push(Reflector({
       level: 20,
-      affected: function(x,y,vx,vy){ var cy = opt.height >> 1; return ( (x<15 || x>opt.width-15) && y >= cy-60 && y <=cy+60 ); },
+      affected: function(x,y,vx,vy){
+        var cy = opt.height >> 1; return ( (x<15 || x>opt.width-15) && y >= cy-60 && y <=cy+60 ); },
       reflect: function(x,y,vx,vy){
-        var res = { vx: (vx<0 ? -5 : 5), vy: 0 };
+        var res = { vy: 0 };
+        if( vx != 0){
+          res.vx = (vx<0 ? -5 : 5);
+        }
         if( x>=10 && x<=opt.width-10){
           res.vx=0;
           res.x = (x < 15 ? 5 : opt.width - 5);
@@ -161,6 +165,11 @@
           }
 
         }
+        var out = '';
+        for(var k in res){
+          out += k+':'+res[k]+'; ';
+        }
+        console.log(out);
         return res;
       }
     }));
