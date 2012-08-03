@@ -359,6 +359,10 @@
       }
     }
 
+    self.is_online = function(){
+      return $f.online;
+    }
+
     self.getPuck = function(){
       return puck;
     }
