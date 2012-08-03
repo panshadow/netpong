@@ -4,8 +4,23 @@
   <link rel="stylesheet" href="style.css">
   <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="script.js"></script>
+  <script type="text/javascript">
+var np = new NetPong({
+  'el': '#game',
+  pnum: 30,
+  bgBoard: '#eeffff',
+  fgPuck: '#000033',
+  ptime:60
+});
+$(function(){
+  np.start();
+})
+  </script>
 </head>
 <body>
   <div id="game"></div>
+  <div id="ctl" style="float:left;width:50px;">
+    <a href="#" id="act_start">start()</a>
+  </div>
 </body>
 </html>

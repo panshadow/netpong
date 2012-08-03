@@ -370,15 +370,6 @@
   }
 
   window.NetPong = NetPong;
+  window.Reflector = Reflector;
 
 })(jQuery,this);
-
-var np = new NetPong({
-  'el': '#game',
-  pnum: 10,
-  bgBoard: '#eeffff',
-  fgPuck: '#000033'
-});
-$(function(){
-  np.start();
-})
