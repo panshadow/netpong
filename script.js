@@ -4,14 +4,36 @@
   var Reflector = function(cf){
     var self = $.extend({
       level: 0,
-      affected: function(x,y,vx,vy){ return false; },
+      north: 0,
+      east: 0,
+      south: 0,
+      west: 0,
+      inside: true,
+
+      through_north: function(y,vy){return (this.inside && y<this.north && vy<0
+        || !this.inside && y>this.north && vy>0); },
+      through_west: function(x,vx){return (this.inside && x<this.west && vx<0
+        || !this.inside && x>this.west && vx>0); },
+      through_south: function(y,vy){return (this.inside && y>this.south && vy>0
+        || !this.inside && y<this.south && vy<0); },
+      through_east: function(x,vx){return (this.inside && x>this.east && vx>0
+        || !this.inside && x<this.east && vx<0); },
+
+      affected: function(x,y,vx,vy){
+        var self = this;
+        return self.through_north(y,vy)
+          || self.through_west(x,vx)
+          || self.through_south(y,vy)
+          || self.through_east(x,vx);
+      },
       reflect: function(x,y,vx,vy){
-        return {
-          x: x,
-          y: y,
-          vx: vx,
-          vy: vy
-        }
+        var resp = {}
+
+        if( self.through_north(y,vy) ){ resp.vy = -vy; resp.y = 2*self.north - y; }
+        if( self.through_east(x,vx) ){ resp.vx = -vx; resp.x = 2*self.east - x; }
+        if( self.through_south(y,vy) ){ resp.vy = -vy; resp.y = 2*self.south - y; }
+        if( self.through_west(x,vx) ){ resp.vx = -vx; resp.x = 2*self.west - x; }
+        return resp;
       }
     },cf);
 
