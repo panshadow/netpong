@@ -342,6 +342,8 @@
       $f.online = true;//setInterval(fnLoop,10);
       $f.fps = setInterval(function(){ self.updateFPS(); },1000);
       time = opt.ptime;
+      score = [0,0];
+      fcounter=0;
       fnLoop();
 
     }
