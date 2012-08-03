@@ -79,14 +79,18 @@
     self.move = function(){
       var now = +(new Date()),
         dt = now-opt.ts;
-        dx = Math.round(opt.vx*dt/1000),
-        dy = Math.round(opt.vy*dt/1000);
+        dx = opt.vx*dt/1000,
+        dy = opt.vy*dt/1000;
       opt.x += dx;
       opt.y += dy;
-      $.extend( opt, opt.board.reflect(opt.x,opt.y,opt.vx,opt.vy) );
+
+      if( self.moving() ){
+        $.extend( opt, opt.board.reflect(opt.x,opt.y,opt.vx,opt.vy) );
+      }
+
 
       opt.ts = now;
-      return { x: opt.x, y: opt.y, r:opt.r, rx: opt.x-opt.r,ry:opt.y-opt.r,rw: 2*opt.r,rh: 2*opt.r };
+      return { x: Math.round(opt.x), y: Math.round(opt.y), r:opt.r, rx: Math.round(opt.x-opt.r),ry: Math.round(opt.y-opt.r),rw: 2*opt.r,rh: 2*opt.r };
     }
 
   }
