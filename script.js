@@ -198,14 +198,19 @@
 
 
     self.reflect = function(){
-      var r = new Reflector();
+      var r = null;
+      var resp = {};
       for(var i=0,n=reflectors.length;i<n;i++){
         var obj = reflectors[i];
-        if( obj.affected.apply(obj,arguments) && obj.level > r.level ){
+        if( obj.affected.apply(obj,arguments) && (r == null || obj.level > r.level) ){
           r = obj;
         }
       }
-      return r.reflect.apply(r,arguments);
+
+      if( r !== null ){
+        resp = r.reflect.apply(r,arguments);
+      }
+      return resp;
     }
 
 
