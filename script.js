@@ -71,6 +71,10 @@
     }
 
 
+    self.moving = function(){
+      return Math.round(opt.vx) || Math.round(opt.vy);
+    }
+
 
     self.move = function(){
       var now = +(new Date()),
