@@ -10,21 +10,23 @@
       west: 0,
       inside: true,
 
-      through_north: function(y,vy){return (this.inside && y<this.north && vy<0
-        || !this.inside && y>this.north && vy>0); },
-      through_west: function(x,vx){return (this.inside && x<this.west && vx<0
-        || !this.inside && x>this.west && vx>0); },
-      through_south: function(y,vy){return (this.inside && y>this.south && vy>0
-        || !this.inside && y<this.south && vy<0); },
-      through_east: function(x,vx){return (this.inside && x>this.east && vx>0
-        || !this.inside && x<this.east && vx<0); },
+      through_north: function(y,vy){return (y<this.north && vy<0) },
+        
+      through_west: function(x,vx){return (x<this.west && vx<0) } ,
+      through_south: function(y,vy){return (y>this.south && vy>0) },
+      through_east: function(x,vx){return (x>this.east && vx>0) },
 
       affected: function(x,y,vx,vy){
         var self = this;
-        return self.through_north(y,vy)
+        return self.inside && ( self.through_north(y,vy)
           || self.through_west(x,vx)
           || self.through_south(y,vy)
-          || self.through_east(x,vx);
+          || self.through_east(x,vx) )
+        || !self.inside && ( 
+          x > self.north 
+          && x < self.south 
+          && y > self.west 
+          && y<self.east);
       },
       reflect: function(x,y,vx,vy){
         var resp = {}
