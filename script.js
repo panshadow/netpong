@@ -176,6 +176,23 @@
     }));
 
 
+    var accelerator = Reflector({
+      level: 20,
+      north: 370,
+      east: (opt.width>>1)+50,
+      south: 390,
+      west: (opt.width>>1)-50,
+      inside: false,
+      reflect: function(x,y,vx,vy){
+        console.log('accelerate');
+        var r = Math.sqrt(vx*vx + vy*vy);
+        return { vx: Math.round(vx*300/r), vy: Math.round(vy*300/r)};
+      }
+    });
+
+    reflectors.push(accelerator);
+
+
 
     self.init = function(){
       var canvasAttr = {
@@ -223,6 +240,7 @@
       //self.clearBoard();
       self.drawBorder();
       self.drawLine();
+      self.drawAccelerator();
       self.drawScore();
       self.drawPuck();
       self.drawFPS();
@@ -256,6 +274,16 @@
         self.stop();
       }
 
+    }
+
+    self.drawAccelerator = function(){
+      $e.ctx.fillStyle = 'yellow';
+      $e.ctx.fillRect(
+        accelerator.west,
+        accelerator.north,
+        accelerator.east - accelerator.west,
+        accelerator.south - accelerator.north
+      );
     }
 
     self.showFrame = function(){
@@ -340,8 +368,8 @@
       for( var i=0,n=puck.length;i<n;i++){
         puck[i].move();
         var r = 100+Math.round(Math.random()*100);
-        var a = Math.random()*2*Math.PI;
-        var vx = Math.round(r*Math.cos(a)) || 10;
+        var a = (Math.random()*4 - 2)*Math.PI/3;
+        var vx = Math.round(r*Math.cos(a));
         var vy = Math.round(r*Math.sin(a));
         //var color = Math.round(Math.sqrt(vx*vx+vy*vy));
         puck[i].set('vx',vx);
