@@ -11,12 +11,12 @@
       inside: true,
 
       through_north: function(y,vy){return (y<this.north && vy<0) },
-        
+
       through_west: function(x,vx){return (x<this.west && vx<0) } ,
       through_south: function(y,vy){return (y>this.south && vy>0) },
       through_east: function(x,vx){return (x>this.east && vx>0) },
 
-      affected: function(x,y,vx,vy){
+      affected: function(id,x,y,vx,vy){
         var self = this;
         return self.inside && ( self.through_north(y,vy)
           || self.through_west(x,vx)
@@ -28,7 +28,7 @@
           && y > self.west 
           && y<self.east);
       },
-      reflect: function(x,y,vx,vy){
+      reflect: function(id,x,y,vx,vy){
         var resp = {}
 
         if( self.through_north(y,vy) ){ resp.vy = -vy; resp.y = 2*self.north - y; }
@@ -42,6 +42,8 @@
     return self;
 
   }
+
+  var last_puck_id=0;
 
   var Puck = function( cf ){
     var self = this;
@@ -58,6 +60,8 @@
       board: null
     },cf);
 
+    var id = +(++last_puck_id);
+
 
 
     self.set = function(key,value){
@@ -70,6 +74,10 @@
       if( key in opt ){
         return opt[key];
       }
+    }
+
+    self.getID = function(){
+      return id;
     }
 
 
@@ -87,7 +95,7 @@
       opt.y += dy;
 
       if( self.moving() ){
-        $.extend( opt, opt.board.reflect(opt.x,opt.y,opt.vx,opt.vy) );
+        $.extend( opt, opt.board.reflect( id, opt.x,opt.y,opt.vx,opt.vy) );
       }
 
 
@@ -147,9 +155,9 @@
 
     reflectors.push(Reflector({
       level: 20,
-      affected: function(x,y,vx,vy){
+      affected: function(id,x,y,vx,vy){
         var cy = opt.height >> 1; return ( (x<15 || x>opt.width-15) && y >= cy-60 && y <=cy+60 ); },
-      reflect: function(x,y,vx,vy){
+      reflect: function(id,x,y,vx,vy){
         var res = { vy: 0 };
         if( vx != 0){
           res.vx = (vx<0 ? -5 : 5);
@@ -349,7 +357,10 @@
     self.drawPuck = function(){
       for(var i=0,n=puck.length;i<n;i++){
         var pp = puck[i].move();
+        var pid = puck[i].getID();
         $e.ctx.fillStyle=puck[i].get('fgPuck');
+
+
         $e.ctx.beginPath();
         $e.ctx.arc(pp.x,pp.y,pp.r,0,2*Math.PI);
         $e.ctx.closePath();
