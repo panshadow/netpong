@@ -283,7 +283,7 @@
       $e.ctx.fillStyle='rgb(0,0,255)';
       $e.ctx.textAlign = 'right';
       $e.ctx.fillText(score[0], (opt.width >> 1) - 10,70);
-      
+
       $e.ctx.font='bold 56px Arial';
       $e.ctx.fillStyle='rgb(255,0,0)';
       $e.ctx.textAlign = 'left';
@@ -396,8 +396,8 @@
       var ey = [15,opt.height-15];
       for( var i=0,n=puck.length;i<n;i++){
         puck[i].move();
-        var r = 100+Math.round(Math.random()*100);
-        var a = (Math.random()*4 - 2)*Math.PI/3;
+        var r = 200+Math.round(Math.random()*100);
+        var a = Math.PI*(Math.random()/2-3/4);
         var vx = Math.round(r*Math.cos(a));
         var vy = Math.round(r*Math.sin(a));
         //var color = Math.round(Math.sqrt(vx*vx+vy*vy));
