@@ -190,14 +190,27 @@
     var accelerator = Reflector({
       level: 20,
       north: 370,
-      east: (opt.width>>1)+50,
+      east: opt.width-150,
       south: 390,
-      west: (opt.width>>1)-50,
+      west: 150,
       inside: false,
-      reflect: function(x,y,vx,vy){
-        console.log('accelerate');
-        var r = Math.sqrt(vx*vx + vy*vy);
-        return { vx: Math.round(vx*300/r), vy: Math.round(vy*300/r)};
+      pucks: {},
+      reflect: function(id,x,y,vx,vy){
+        for(var i=0,n=puck.length;i<n;i++){
+          if(puck[i].getID() === id){
+            puck[i].set('fgPuck','#0000ff');
+          }
+        }
+        var resp = {};
+        if( !(id in this.pucks) ){
+
+          var r = Math.sqrt(vx*vx + vy*vy);
+          resp.vx=Math.round(vx*300/r);
+          resp.vy=Math.round(vy*300/r)
+          this.pucks[id] = true;
+        }
+
+        return resp;
       }
     });
 
