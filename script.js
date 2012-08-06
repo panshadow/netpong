@@ -155,9 +155,19 @@
 
     reflectors.push(Reflector({
       level: 20,
+      score: {},
       affected: function(id,x,y,vx,vy){
         var cy = opt.height >> 1; return ( (x<15 || x>opt.width-15) && y >= cy-60 && y <=cy+60 ); },
       reflect: function(id,x,y,vx,vy){
+        if( ! (id in this.score) ){
+          if( x < (opt.width>>1) ){
+            score[0]++;
+          }
+          else{
+            score[1]++;
+          }
+          this.score[id]=1;
+        }
         var res = { vy: 0 };
         if( vx != 0){
           res.vx = (vx<0 ? -5 : 5);
@@ -165,20 +175,13 @@
         if( x<=10 || x>=opt.width-10){
           res.vx=0;
           if( x < (opt.width>>1) ){
-            score[0]++;
             res.x = 5;
           }
           else{
-            score[1]++;
             res.x = opt.width - 5;
           }
 
         }
-        var out = '';
-        for(var k in res){
-          out += k+':'+res[k]+'; ';
-        }
-        console.log(out);
         return res;
       }
     }));
