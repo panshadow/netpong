@@ -223,6 +223,7 @@
       //self.clearBoard();
       self.drawBorder();
       self.drawLine();
+      self.drawScore();
       self.drawPuck();
       self.drawFPS();
     }
@@ -231,7 +232,20 @@
       fcounter++;
       $e.ctx.font='8px Arial';
       $e.ctx.fillStyle='#000000';
-      $e.ctx.fillText('FPS:'+fps+' score: '+score[0]+':'+score[1]+' time: '+time,50,50);
+      $e.ctx.fillText('FPS:'+fps+' time: '+time,50,50);
+    }
+
+
+    self.drawScore = function(){
+      $e.ctx.font='bold 56px Arial';
+      $e.ctx.fillStyle='rgb(0,0,255)';
+      $e.ctx.textAlign = 'right';
+      $e.ctx.fillText(score[0], (opt.width >> 1) - 10,70);
+      
+      $e.ctx.font='bold 56px Arial';
+      $e.ctx.fillStyle='rgb(255,0,0)';
+      $e.ctx.textAlign = 'left';
+      $e.ctx.fillText(score[1], (opt.width >> 1) + 10,70);
     }
 
     self.updateFPS = function(){
