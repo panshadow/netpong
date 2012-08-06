@@ -373,14 +373,16 @@
     self.drawPuck = function(){
       for(var i=0,n=puck.length;i<n;i++){
         var pp = puck[i].move();
-        var pid = puck[i].getID();
-        $e.ctx.fillStyle=puck[i].get('fgPuck');
+        if( puck[i].moving() ){
+          var pid = puck[i].getID();
+          $e.ctx.fillStyle=puck[i].get('fgPuck');
 
 
-        $e.ctx.beginPath();
-        $e.ctx.arc(pp.x,pp.y,pp.r,0,2*Math.PI);
-        $e.ctx.closePath();
-        $e.ctx.fill();
+          $e.ctx.beginPath();
+          $e.ctx.arc(pp.x,pp.y,pp.r,0,2*Math.PI);
+          $e.ctx.closePath();
+          $e.ctx.fill();
+        }
       }
     }
 
