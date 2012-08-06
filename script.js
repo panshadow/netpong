@@ -154,10 +154,9 @@
         if( vx != 0){
           res.vx = (vx<0 ? -5 : 5);
         }
-        if( x>=10 && x<=opt.width-10){
+        if( x<=10 || x>=opt.width-10){
           res.vx=0;
-          res.x = (x < 15 ? 5 : opt.width - 5);
-          if( x < 15 ){
+          if( x < (opt.width>>1) ){
             score[0]++;
             res.x = 5;
           }
