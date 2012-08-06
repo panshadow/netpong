@@ -22,11 +22,11 @@
           || self.through_west(x,vx)
           || self.through_south(y,vy)
           || self.through_east(x,vx) )
-        || !self.inside && ( 
-          x > self.north 
-          && x < self.south 
-          && y > self.west 
-          && y<self.east);
+        || !self.inside && (
+          y > self.north
+          && y < self.south
+          && x > self.west
+          && x <self.east);
       },
       reflect: function(id,x,y,vx,vy){
         var resp = {}
